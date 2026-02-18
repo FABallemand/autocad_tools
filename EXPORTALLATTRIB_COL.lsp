@@ -3,7 +3,7 @@
 (defun c:EXPORTALLATTRIB_COL (/ blk fname ss i ent vEnt attVar attList tags tag 
                               csvData f handle csvRow valsAlist 
                               ; helpers
-                              _sa->list _csv-escape
+                              _sa->list
                              ) 
 
   ;; --- helpers -------------------------------------------------------------
@@ -19,24 +19,6 @@
        (vlax-safearray->list v)
       )
       (t nil)
-    )
-  )
-
-  ;; Échappe pour CSV (séparateur ;), supprime CR/LF, double les guillemets
-  (defun _csv-escape (s / s1 needQuote) 
-    (if (/= (type s) 'STR) 
-      (setq s (vl-prin1-to-string s))
-    )
-    (setq s1 (vl-string-translate "\n\r" "  " s))
-    (setq needQuote (or (wcmatch s1 "*;*") 
-                        (wcmatch s1 "*\"*")
-                        (wcmatch s1 "*,*")
-                        (wcmatch s1 "* *")
-                    )
-    )
-    (if needQuote 
-      (strcat "\"" (vl-string-subst "\"\"" "\"" s1) "\"")
-      s1
     )
   )
 
@@ -80,7 +62,6 @@
                              (list "HANDLE;BLOC")
                              (mapcar 
                                (function 
-                                 ;  (lambda (tag) (strcat ";" (_csv-escape tag)))
                                  (lambda (tag) (strcat ";" tag))
                                )
                                (if (listp tags) tags '())
@@ -115,12 +96,10 @@
         )
 
         ;; Construire la ligne : HANDLE;BLOC;val(TAG1);val(TAG2);...
-        ; (setq csvRow (strcat (_csv-escape handle) ";" (_csv-escape blk)))
         (setq csvRow (strcat handle ";" blk))
         (foreach tag tags 
           (setq csvRow (strcat csvRow 
                                ";"
-                               ;  (_csv-escape (cdr (assoc tag valsAlist)))
                                (cdr (assoc tag valsAlist))
                        )
           )
