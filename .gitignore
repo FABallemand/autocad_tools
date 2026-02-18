@@ -1,3 +1,6 @@
+*.csv
+*.dwg
+
 *.FASL
 *.fasl
 *.lisp-temp
